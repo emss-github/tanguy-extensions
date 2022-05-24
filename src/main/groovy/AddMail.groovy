@@ -316,7 +316,7 @@ public class AddMail extends ExtendM3Trigger {
     String CNPE = ""
 
     String iADID = ""
-    String iNFTR = "4"
+    String iNFTR = "2"
 
     int indCNPE = 0
     ArrayList<String> tabCNPE = new ArrayList<String>()
