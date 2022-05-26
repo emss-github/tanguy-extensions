@@ -1,4 +1,15 @@
-public class AddMail extends ExtendM3Trigger {
+/**
+ * README
+ * This extension is being triggered by MNS215
+ *
+ * Name: CUS_xt_MNS215_B_Before
+ * Description: Adds customer/supplier related mail addresses to MNS215
+ * Date       Changed By                     Description
+ * 20220301   Ludovic Travers                Create CUS_xt_MNS215_B_Before extension
+ * 20220525   Eric Masson                    Fix post review issues
+ */
+
+public class CUS_xt_MNS215_B_Before extends ExtendM3Trigger {
 
   private final ProgramAPI program
   private final InteractiveAPI interactive
@@ -6,8 +17,9 @@ public class AddMail extends ExtendM3Trigger {
   private final LoggerAPI logger
   private final MICallerAPI miCaller
 
-  public AddMail(ProgramAPI program, InteractiveAPI interactive,
-                    DatabaseAPI database, LoggerAPI logger, MICallerAPI miCaller) {
+
+  public CUS_xt_MNS215_B_Before(ProgramAPI program, InteractiveAPI interactive,
+                                DatabaseAPI database, LoggerAPI logger, MICallerAPI miCaller) {
     this.program = program
     this.interactive = interactive
     this.database = database
@@ -15,40 +27,34 @@ public class AddMail extends ExtendM3Trigger {
     this.miCaller = miCaller
   }
 
-  def extractInts( String input ) {
-    input.findAll( /\d+/ ).first()
-  }
-
   public void main() {
     def CM101 = program.getTableRecord("CCM101")
     int CONO = CM101.FXCONO
-
     def CM110 = program.getTableRecord("CCM110")
-
     String BJNO = CM110.DPBJNO
     String PRTF = CM110.DPPRTF
     String QCMD = ""
 
     QCMD = callGetCJBCMD_withDatabase(BJNO, "01")
-    switch(PRTF.trim()) {
-      case "OIS606PF" :
+    switch (PRTF.trim()) {
+      case "OIS606PF":
         retrieveInfos(CONO, BJNO, PRTF, QCMD)
         break
-      case "OIS199PF" :
+      case "OIS199PF":
         retrieveInfos(CONO, BJNO, PRTF, QCMD)
         break
-      case "PPS601PF" :
+      case "PPS601PF":
         retrieveInfos(CONO, BJNO, PRTF, QCMD)
         break
-      case "PPS821PF" :
+      case "PPS821PF":
         retrieveMPCLAH(CONO, BJNO, PRTF, QCMD)
         break
-      case "MMS480PF" :
+      case "MMS480PF":
         int DLIX = program.getLDAZZ().DLIX
         String oCONA = this.callMHDISH_withDatabase(CONO, DLIX)
         this.callCMS055MI_LstByCustomer(BJNO, PRTF, oCONA, "06", "")
         break
-      case "MWS620PF" :
+      case "MWS620PF":
         int DLIX = program.getLDAZZ().DLIX
         String oCONA = this.callMHDISH_withDatabase(CONO, DLIX)
         this.callCMS055MI_LstByCustomer(BJNO, PRTF, oCONA, "06", "")
@@ -88,7 +94,6 @@ public class AddMail extends ExtendM3Trigger {
     String oCUNO = ""
     String oPYNO = ""
     String oSUNO = ""
-
     String ORNO = ""
     String PUNO = ""
     String IVNO = ""
@@ -97,8 +102,8 @@ public class AddMail extends ExtendM3Trigger {
     String INPX = ""
 
     pos = pQCMD.indexOf("ORNO")
-    posfin = pQCMD.indexOf("'", pos+10)
-    ORNO = pQCMD.substring(pos+7, posfin)
+    posfin = pQCMD.indexOf("'", pos + 10)
+    ORNO = pQCMD.substring(pos + 7, posfin)
     if (pos != -1) {
       oCUNO = this.callOOHEAD_withDatabase(pCONO, pBJNO, pPRTF, ORNO)
       this.callCMS055MI_LstByCustomer(pBJNO, pPRTF, oCUNO, "06", "")
@@ -106,13 +111,12 @@ public class AddMail extends ExtendM3Trigger {
     } else {
       pos = pQCMD.indexOf("PUNO=")
       if (pos != -1) {
-        posfin = pQCMD.indexOf("'", pos+10)
-        PUNO = pQCMD.substring(pos+7, posfin)
-      }
-      else {
+        posfin = pQCMD.indexOf("'", pos + 10)
+        PUNO = pQCMD.substring(pos + 7, posfin)
+      } else {
         pos = pQCMD.indexOf("PUNO =")
-        posfin = pQCMD.indexOf("'", pos+12)
-        PUNO = pQCMD.substring(pos+9, posfin)
+        posfin = pQCMD.indexOf("'", pos + 12)
+        PUNO = pQCMD.substring(pos + 9, posfin)
       }
 
       if (pos != -1) {
@@ -121,13 +125,12 @@ public class AddMail extends ExtendM3Trigger {
       } else {
         pos = pQCMD.indexOf("EXIN=")
         if (pos != -1) {
-          posfin = pQCMD.indexOf("'", pos+10)
-          IVNO = pQCMD.substring(pos+7, posfin)
-        }
-        else {
+          posfin = pQCMD.indexOf("'", pos + 10)
+          IVNO = pQCMD.substring(pos + 7, posfin)
+        } else {
           pos = pQCMD.indexOf("EXIN =")
-          posfin = pQCMD.indexOf("'", pos+12)
-          IVNO = pQCMD.substring(pos+9, posfin)
+          posfin = pQCMD.indexOf("'", pos + 12)
+          IVNO = pQCMD.substring(pos + 9, posfin)
         }
 
         if (IVNO.length() > 9) {
@@ -137,10 +140,10 @@ public class AddMail extends ExtendM3Trigger {
         }
 
         pos = pQCMD.indexOf("DIVI")
-        posfin = pQCMD.indexOf("'", pos+8)
-        DIVI = pQCMD.substring(pos+7, posfin)
+        posfin = pQCMD.indexOf("'", pos + 8)
+        DIVI = pQCMD.substring(pos + 7, posfin)
         pos = pQCMD.indexOf("YEA4")
-        YEA4 = pQCMD.substring(pos+5, pos+9)
+        YEA4 = pQCMD.substring(pos + 5, pos + 9)
         if (pos != -1) {
           oPYNO = this.callOIS350MI_GetInvHead(pCONO, DIVI, YEA4, IVNO, INPX)
           this.callCMS055MI_LstByCustomer(pBJNO, pPRTF, oPYNO, "03", "FACTURE")
@@ -150,18 +153,24 @@ public class AddMail extends ExtendM3Trigger {
   }
 
   /**
+   * Remove alpha caracters
+   */
+  def extractInts(String input) {
+    input.findAll(/\d+/).first()
+  }
+
+  /**
    * Retrieve informations from MPCLAH to get contacts
    */
   private void retrieveMPCLAH(int pCONO, String pBJNO, String pPRTF, String pQCMD) {
     int pos = 0
     int posfin = 0
     String oSUNO = ""
-
     String CLAN = ""
 
     pos = pQCMD.indexOf("CLAN")
-    posfin = pQCMD.indexOf("'", pos+10)
-    CLAN = pQCMD.substring(pos+7, posfin)
+    posfin = pQCMD.indexOf("'", pos + 10)
+    CLAN = pQCMD.substring(pos + 7, posfin)
     if (pos != -1) {
       oSUNO = this.callMPCLAH_withDatabase(pCONO, CLAN)
       this.callCRS620MI_LstSupplierRef(pBJNO, pPRTF, oSUNO, "10")
@@ -279,7 +288,7 @@ public class AddMail extends ExtendM3Trigger {
    */
   private String callOIS350MI_GetInvHead(int pCONO, String pDIVI, String pYEA4, String pIVNO, String pINPX) {
     String PYNO = ""
-    def params = ["CONO" : ""+pCONO, "DIVI" : pDIVI, "YEA4" : pYEA4, "IVNO" : pIVNO, "INPX": pINPX]
+    def params = ["CONO": "" + pCONO, "DIVI": pDIVI, "YEA4": pYEA4, "IVNO": pIVNO, "INPX": pINPX]
 
     def callback = {
       Map<String, String> response ->
@@ -292,42 +301,21 @@ public class AddMail extends ExtendM3Trigger {
   }
 
   /**
-   * Call PPS200MI_GetHead
-   */
-  private String callPPS200MI_GetHead(int pCONO, String pPUNO) {
-    String SUNO = ""
-    String sCONO = ""+pCONO
-
-    def params = ["CONO" : "100", "PUNO" : "0102056"]
-    def callback = {
-      Map<String, String> response ->
-        if (response.SUNO != null) {
-          SUNO = response.SUNO.trim()
-        }
-    }
-    miCaller.call("PPS200MI", "GetHead", params, callback)
-    return SUNO
-  }
-
-  /**
    * Call CMS055MI_LstByCustomer
    */
   private void callCMS055MI_LstByCustomer(String pBJNO, String pPRTF, String pCUNO, String pADRT, String pRFTP) {
     String CNPE = ""
-
     String iADID = ""
     String iNFTR = "2"
-
     int indCNPE = 0
     ArrayList<String> tabCNPE = new ArrayList<String>()
-
     HashMap<String, String> tabCNPE_EMAL = new HashMap<String, String>()
 
-    def params = ["CUNO" : pCUNO, "ADRT" : pADRT, "ADID" : iADID, "RFTP" : pRFTP, "NFTR" : iNFTR]
+    def params = ["CUNO": pCUNO, "ADRT": pADRT, "ADID": iADID, "RFTP": pRFTP, "NFTR": iNFTR]
 
     def callback = {
       Map<String, String> response ->
-        if ( (response.CNPE != null) && (response.CUNO.trim().equals(pCUNO.trim())) ) {
+        if ((response.CNPE != null) && (response.CUNO.trim().equals(pCUNO.trim()))) {
           CNPE = response.CNPE.trim()
           tabCNPE.push(CNPE)
           indCNPE++
@@ -336,7 +324,7 @@ public class AddMail extends ExtendM3Trigger {
     miCaller.call("CMS055MI", "LstByCustomer", params, callback)
 
     String pEMAL = ""
-    for(int i=0; i < indCNPE; i++) {
+    for (int i = 0; i < indCNPE; i++) {
       tabCNPE_EMAL.put(tabCNPE[i], this.callCRS618MI_Get(pBJNO, pPRTF, tabCNPE[i]))
     }
 
@@ -351,7 +339,7 @@ public class AddMail extends ExtendM3Trigger {
    */
   private String callCRS618MI_Get(String pBJNO, String pPRTF, String pCNPE) {
     String EMAL = ""
-    def params = ["CNPE" : pCNPE]
+    def params = ["CNPE": pCNPE]
 
     def callback = {
       Map<String, String> response ->
@@ -368,12 +356,10 @@ public class AddMail extends ExtendM3Trigger {
    * Call CRS620MI_LstSupplierRef
    */
   private void callCRS620MI_LstSupplierRef(String pBJNO, String pPRTF, String pSUNO, String pRFTY) {
-
     String EMAL = ""
-
     int indEMAL = 0
     ArrayList<String> tabEMAL = new ArrayList<String>()
-    def params = ["SUNO" : pSUNO, "RFTY" : pRFTY]
+    def params = ["SUNO": pSUNO, "RFTY": pRFTY]
 
     def callback = {
       Map<String, String> response ->
@@ -385,30 +371,33 @@ public class AddMail extends ExtendM3Trigger {
     }
     miCaller.call("CRS620MI", "LstSupplierRef", params, callback)
 
-    for(int i=0; i < indEMAL; i++) {
+    for (int i = 0; i < indEMAL; i++) {
       this.callAddMedia(pBJNO, pPRTF, tabEMAL.get(i))
     }
   }
 
+  /**
+   * Call MNS215MI_AddMedia
+   */
   public void callAddMedia(String pBJNO, String pPRTF, String email) {
     String subject = ""
-    switch(pPRTF.trim()) {
-      case "OIS606PF" :
+    switch (pPRTF.trim()) {
+      case "OIS606PF":
         subject = "Confirmation de commande"
         break
-      case "OIS199PF" :
+      case "OIS199PF":
         subject = "Facture de vente"
         break
-      case "PPS601PF" :
+      case "PPS601PF":
         subject = "Ordre Achat"
         break
-      case "PPS821PF" :
+      case "PPS821PF":
         subject = "Retour Fournisseur"
         break
-      case "MMS480PF" :
+      case "MMS480PF":
         subject = "Bon Livraison"
         break
-      case "MWS620PF" :
+      case "MWS620PF":
         subject = "Avis d'Expédition"
         break
       default:
@@ -416,8 +405,8 @@ public class AddMail extends ExtendM3Trigger {
         break
     }
 
-    def params = [ "BJNO" : pBJNO.toString(), "PRTF" : pPRTF.toString(), "MEDC" : "*MAIL",
-                   "TOMA" : email, "FRMA" : "M3@tanguy.fr", "SUBJ" : subject ]
+    def params = ["BJNO": pBJNO.toString(), "PRTF": pPRTF.toString(), "MEDC": "*MAIL",
+                  "TOMA": email, "FRMA": "M3@tanguy.fr", "SUBJ": subject]
 
     def callback = {}
     miCaller.call("MNS215MI", "AddMedia", params, callback)
