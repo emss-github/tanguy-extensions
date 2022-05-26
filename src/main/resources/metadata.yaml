@@ -1,6 +1,6 @@
 metadataVersion: 1
 extensions:
-  - name: AddMail
+  - name: CUS_xt_MNS215_B_Before
     triggers:
       - type: METHOD
         program: MNS215
